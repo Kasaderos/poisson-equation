@@ -9,20 +9,20 @@ from mpl_toolkits.mplot3d.axes3d import Axes3D
 def u0(x, y):
     return 0.0
 
-def phi1(y):
+def phi1(x):
     return 0.0
 
-def phi2(y):
-    return y*y + y
+def phi2(x):
+    return x + x*x 
 
-def phi3(x):
+def phi3(y):
     return 0.0
 
-def phi4(x):
-    return x*x*x+x
+def phi4(y):
+    return y + y*y
 
 def ua(x, y):
-    return x*y * (x*x+y)
+    return x*x*y + y*y*x 
 
 T = 1.0
 L = 1.0
@@ -38,7 +38,6 @@ tau = T / m
 
 U0 = np.zeros((N1, N1))
 U_old = np.zeros((N1, N1))
-U_med = np.zeros((N1, N1))
 U_new = np.zeros((N1, N1))
 
 U0 = np.array([[ua(xi, yi) for yi in y] for xi in x])
@@ -63,10 +62,8 @@ start = t.time()
 for k in range(m):
     for i in range(N1):
         U_old[0, i] = phi3(y[i])
-        U_med[0, i] = phi3(y[i])
         U_new[0, i] = phi3(y[i])
         U_old[N, i] = phi4(y[i])
-        U_med[N, i] = phi4(y[i])
         U_new[N, i] = phi4(y[i])
 
     for i in range(1, N):
@@ -79,22 +76,20 @@ for k in range(m):
         for i in range(1, N):
             alpha[i+1] = -C[i, j] / (B[i, j] + A[i, j] * alpha[i])
             beta[i+1] = (D[i, j] - A[i, j]*beta[i])/(B[i, j] + A[i, j]*alpha[i])
-        U_med[N, j] = phi4(x[j])
+        U_old[N, j] = phi4(x[j])
         for i in range(N-1, 0, -1):
-            U_med[i, j] = alpha[i+1] * U_med[i+1, j] + beta[i+1]
+            U_old[i, j] = alpha[i+1] * U_old[i+1, j] + beta[i+1]
     
     for i in range(N1):
         U_old[0, i] = phi1(x[i])
-        U_med[0, i] = phi1(x[i])
         U_new[0, i] = phi1(x[i])
         U_old[N, i] = phi2(x[i])
-        U_med[N, i] = phi2(x[i])
         U_new[N, i] = phi2(x[i])
 
 
     for i in range(1, N):
         for j in range(1, N):
-            D[i, j] = U_med[i, j]/tau + (U_med[i, j+1] - 2*U_med[i, j] + U_med[i, j-1]) / (2*h2)
+            D[i, j] = U_old[i, j]/tau + (U_old[i, j+1] - 2*U_old[i, j] + U_old[i, j-1]) / (2*h2)
 
     for i in range(1, N):
         alpha[1] = 0
@@ -112,6 +107,9 @@ end = t.time()
 print('time = ', end-start, sep='')
 
 Ua = np.array([[ua(xi, yi) for yi in y] for xi in x])
+
+av_err = np.max(np.abs(Ua-U_new))
+print(f"|Ua-U| = {av_err}")
 
 mx = U_new.max()
 mn = U_new.min()
