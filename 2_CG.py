@@ -19,7 +19,7 @@ def f(x, y):
 # def f(x, y):
 #     return -np.cos(x) - np.sin(y)
 
-N = 4 
+N = 32 
 N1 = N + 1 
 N_1 = N - 1
 L = 1.0 
@@ -65,8 +65,8 @@ for i in range(1, N):
 
 #print(F)
 b = F[1:N, 1:N].ravel()
-print(C)
-print(I)
+# print(C)
+# print(I)
 
 A = np.zeros((N_1*N_1, N_1*N_1)) 
 
@@ -79,13 +79,13 @@ for i in range(1, N_1-1):
 A[(N_1-1)*N_1:N_1*N_1, (N_1-2)*N_1:(N_1-1)*N_1] = I.copy()
 A[(N_1-1)*N_1:N_1*N_1, (N_1-1)*N_1:N_1*N_1] = C.copy()
 
-print(A)
-print(b)
+# print(A)
+# print(b)
 eigens = np.linalg.eigvals(A)
 lambda_max = np.max(eigens)
 lambda_min = np.min(eigens)
 kappa = lambda_max / lambda_min
-print("lamba_min = ", lambda_min, "lambda_max = ", lambda_max, "kappa = ", kappa)
+# print("lamba_min = ", lambda_min, "lambda_max = ", lambda_max, "kappa = ", kappa)
 k = 0
 x = np.zeros(N_1 * N_1)
 
@@ -108,12 +108,6 @@ while norm_p2(r) > eps:
     err = norm(u - ua[1:N,1:N])
     print('max|u-u*| =', err)
     print('||r_k||_2 =', norm_p2(r))
-    time.sleep(0.1)
+    # time.sleep(0.1)
 
-# print(x)
-u = x.reshape((N_1, N_1))
-print(u)
-print(ua)
-err = norm(u - ua[1:N, 1:N])
-print('max|u-u*| =', err)
 
