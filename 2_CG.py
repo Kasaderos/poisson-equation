@@ -13,7 +13,13 @@ def mu(x, y):
 def f(x, y):
     return 12 * x * y
 
-N = 12 
+# def mu(x, y):
+#     return np.cos(x) + np.sin(y)
+
+# def f(x, y):
+#     return -np.cos(x) - np.sin(y)
+
+N = 4 
 N1 = N + 1 
 N_1 = N - 1
 L = 1.0 
@@ -41,27 +47,27 @@ for i in range(1, N_1-1):
 C[N_1-1, N_1-2], C[N_1-1, N_1-1] = a, b 
 
 C = 1/h2 * C
-I = -1/h2 * np.eye(N_1)
+I = -1*1/h2 * np.eye(N_1)
 
 F = np.zeros((N, N))
 
 for i in range(1, N):
     for j in range(1, N):
-        F[i, j] = f(x[i], y[j]) 
+        F[i, j] = -f(x[i], y[j]) 
         if i-1 < 1 and 1 <= j <= N_1:
-            F[i, j] += mu(0.0, y[j])
+            F[i, j] += mu(0.0, y[j]) / h2
         if i+1 >= N and 1 <= j <= N_1:
-            F[i, j] += mu(1.0, y[j])
+            F[i, j] += mu(1.0, y[j]) / h2
         if j-1 < 1 and 1 <= i <= N_1:
-            F[i, j] += mu(x[i], 0.0)
+            F[i, j] += mu(x[i], 0.0) / h2
         if j+1 >= N and 1 <= i <= N_1:
-            F[i, j] += mu(x[i], 1.0)
+            F[i, j] += mu(x[i], 1.0) / h2
 
-# print(F)
+#print(F)
 b = F[1:N, 1:N].ravel()
-# print(C)
-# print(I)
-# print(b)
+print(C)
+print(I)
+
 A = np.zeros((N_1*N_1, N_1*N_1)) 
 
 A[:N_1, :N_1] = C.copy()
@@ -73,18 +79,20 @@ for i in range(1, N_1-1):
 A[(N_1-1)*N_1:N_1*N_1, (N_1-2)*N_1:(N_1-1)*N_1] = I.copy()
 A[(N_1-1)*N_1:N_1*N_1, (N_1-1)*N_1:N_1*N_1] = C.copy()
 
-# print(A)
-# print(b)
+print(A)
+print(b)
 eigens = np.linalg.eigvals(A)
 lambda_max = np.max(eigens)
 lambda_min = np.min(eigens)
 kappa = lambda_max / lambda_min
-print("kappa", kappa)
+print("lamba_min = ", lambda_min, "lambda_max = ", lambda_max, "kappa = ", kappa)
 k = 0
-x = 0
+x = np.zeros(N_1 * N_1)
+
 r_old = b.copy()
-r = b.copy()
+r = b.copy() 
 p = b.copy()
+
 eps = 1e-3
 while norm_p2(r) > eps: 
     z = np.dot(A, p)
@@ -94,7 +102,7 @@ while norm_p2(r) > eps:
     mu = np.dot(r.T, r) / np.dot(r_old.T, r_old)
     p = r + mu * p
 
-    r_old = r.copy()
+    r_old, r = r, r_old
     
     u = x.reshape((N_1, N_1))
     err = norm(u - ua[1:N,1:N])
@@ -104,8 +112,8 @@ while norm_p2(r) > eps:
 
 # print(x)
 u = x.reshape((N_1, N_1))
-# print(u)
-# print(ua)
+print(u)
+print(ua)
 err = norm(u - ua[1:N, 1:N])
 print('max|u-u*| =', err)
 
