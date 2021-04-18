@@ -11,9 +11,9 @@ def mu(x, y):
     return x*x*x*y + x*y*y*y
 
 def f(x, y):
-    return -12 * x * y
+    return 12 * x * y
 
-N = 4 
+N = 32 
 N1 = N + 1 
 N_1 = N - 1
 L = 1.0 
@@ -21,8 +21,8 @@ h = L/N
 h2 = h*h
 x = np.linspace(0.0, L, N1)
 y = np.linspace(0.0, L, N1)
-print(x)
-print(y)
+# print(x)
+# print(y)
 
 u = np.zeros((N1, N1))
 
@@ -83,14 +83,14 @@ M_inv = np.linalg.inv(M)
 # print(A)
 # print(M)
 # print(b)
-eigens = np.linalg.eigvals(np.dot(M_inv, A))
+eigens = np.linalg.eigvals(A)
 lambda_max = np.max(eigens)
 lambda_min = np.min(eigens)
 kappa = lambda_max / lambda_min
 print("kappa=", kappa)
 k = 0
-x = 0
-r_old = b.copy()
+x = np.zeros(N_1 * N_1)
+r_old = b.copy() - np.dot(A, x) 
 r = r_old.copy()
 
 
@@ -119,10 +119,10 @@ while norm_p2(r) > eps:
     # print('||r_k||_2 =', norm_p2(r))
     time.sleep(0.1)
 
-print(x)
+# print(x)
 u = x.reshape((N_1, N_1))
-print(u)
-print(ua)
+# print(u)
+# print(ua)
 err = norm(u - ua[1:N, 1:N])
 print('max|u-u*| =', err)
 
