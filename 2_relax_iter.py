@@ -1,10 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Sun Apr  4 17:57:15 2021
-
-@author: kasaderos
-"""
-
 import numpy as np
 import time
 
