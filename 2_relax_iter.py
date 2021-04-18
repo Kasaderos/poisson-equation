@@ -28,8 +28,8 @@ x = np.linspace(0.0, 1.0, N1)
 y = np.linspace(0.0, 1.0, N1)
 
 ua = np.array([[mu(x[i], y[j]) for j in range(N1)] for i in range(N1)])
-
-w = 0.5
+roh = 0.98
+w = 2 / (1 + np.sqrt(1-roh * roh))
 u = np.zeros((N1, N1))
 u0 = u.copy()
 u_old = u.copy()
@@ -40,45 +40,44 @@ m = int(2*(np.log(1/eps))/(np.pi*h)+1)
 print('optimal m = ', m)
 print('h^2 = ', h*h)
 
+for i in range(N1):
+    u[i, 0] = mu(x[i], 0.0)
+    u[i, N] = mu(x[i], 1.0)
+    u[0, i] = mu(0.0, y[i]) 
+    u[N, i] = mu(1.0, y[i])
 
 while m > 0:
-    for i in range(N1):
-        u_old[i, 0] = mu(x[i], 0.0)
-        u_old[i, N] = mu(x[i], 1.0)
-        u_old[0, i] = mu(0.0, y[i]) 
-        u_old[N, i] = mu(1.0, y[i])
 
     for i in range(1, N):
         for j in range(1, N):
-            u[i, j] = u_old[i, j] + w * (u[i-1, j] + u_old[i+1, j] + u[i, j-1] + u_old[i, j+1] + h*h*f(x[i], y[i]) - 4 * u_old[i, j]) / 4 
+            u[i, j] = u_old[i, j] + w * (u[i-1, j] + u_old[i+1, j] + u[i, j-1] + u_old[i, j+1] + h*h*f(x[i], y[j]) - 4 * u_old[i, j]) / 4 
     
-    u, u_old = u_old, u
+    u_old = u.copy()
 
     err = norm(u - ua)
     m -= 1
     print(err, err / norm(u0-ua), norm(u_old-u))
-    time.sleep(0.01)    
 print('max|u-u*| =', err)
 
-mx = u.max()
-mn = u.min()
-X, Y = np.meshgrid(x, x)
-fig = plt.figure(figsize=(12,5.5))
-cmap = mpl.cm.get_cmap('RdBu_r')
-ax =  fig.add_subplot(1,2,1)
-c = ax.pcolor(X, Y, u, vmin=mn, vmax=mx, cmap=cmap)
-ax.set_xlabel(r"$x_1$", fontsize=14)
-ax.set_ylabel(r"$x_2$", fontsize=14)
+# mx = u.max()
+# mn = u.min()
+# X, Y = np.meshgrid(x, x)
+# fig = plt.figure(figsize=(12,5.5))
+# cmap = mpl.cm.get_cmap('RdBu_r')
+# ax =  fig.add_subplot(1,2,1)
+# c = ax.pcolor(X, Y, u, vmin=mn, vmax=mx, cmap=cmap)
+# ax.set_xlabel(r"$x_1$", fontsize=14)
+# ax.set_ylabel(r"$x_2$", fontsize=14)
 
-ax =  fig.add_subplot(1,2,2, projection='3d')
-p = ax.plot_surface(X, Y, u, vmin=mn, vmax=mx, rstride=3, cstride=3, linewidth=0, cmap=cmap)
-ax.set_xlabel(r"$x_1$", fontsize=14)
-ax.set_ylabel(r"$x_2$", fontsize=14)
+# ax =  fig.add_subplot(1,2,2, projection='3d')
+# p = ax.plot_surface(X, Y, u, vmin=mn, vmax=mx, rstride=3, cstride=3, linewidth=0, cmap=cmap)
+# ax.set_xlabel(r"$x_1$", fontsize=14)
+# ax.set_ylabel(r"$x_2$", fontsize=14)
 
-cb = plt.colorbar(p, ax=ax, shrink=0.75)
-cb.set_label(r"$u(x, y)$", fontsize=14)
+# cb = plt.colorbar(p, ax=ax, shrink=0.75)
+# cb.set_label(r"$u(x, y)$", fontsize=14)
 
-fig1, ax1 = plt.subplots()
-cs = plt.imshow(u, cmap='inferno')
-fig1.colorbar(cs)
-plt.show()
+# fig1, ax1 = plt.subplots()
+# cs = plt.imshow(u, cmap='inferno')
+# fig1.colorbar(cs)
+# plt.show()
