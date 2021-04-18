@@ -74,6 +74,8 @@ A[(N_1-1)*N_1:N_1*N_1, (N_1-1)*N_1:N_1*N_1] = C.copy()
 
 
 M = np.diag(np.diag(A))
+
+M_inv = np.linalg.inv(M)
 # M = np.zeros((N_1*N_1, N_1*N_1)) 
 # for i in range(N_1):
 #     M[i*N_1:(i+1)*N_1, (i)*N_1:(i+1)*N_1] = C.copy() 
@@ -81,7 +83,7 @@ M = np.diag(np.diag(A))
 # print(A)
 # print(M)
 # print(b)
-eigens = np.linalg.eigvals(A)
+eigens = np.linalg.eigvals(np.dot(M_inv, A))
 lambda_max = np.max(eigens)
 lambda_min = np.min(eigens)
 kappa = lambda_max / lambda_min
@@ -91,7 +93,6 @@ x = 0
 r_old = b.copy()
 r = r_old.copy()
 
-M_inv = np.linalg.inv(M)
 
 p = np.dot(M_inv, b.copy())
 
@@ -120,8 +121,8 @@ while norm_p2(r) > eps:
 
 print(x)
 u = x.reshape((N_1, N_1))
-# print(u)
-# print(ua)
+print(u)
+print(ua)
 err = norm(u - ua[1:N, 1:N])
 print('max|u-u*| =', err)
 
