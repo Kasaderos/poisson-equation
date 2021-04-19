@@ -80,11 +80,13 @@ def pow_two(n):
         i *= 2
     return i
 
-teta = get_teta(m)
+teta = get_teta(m+1)
+teta = np.array([0] + teta) 
+tau = np.zeros(m+1)
+for k in range(1, m+1):
+    tau[k] = 2 /  (delta2 + delta + (delta2-delta)*np.cos(teta[k] * np.pi / (2 * m))) 
 
-tau = np.array([2 /  (delta2 + delta + (delta2-delta)*np.cos(teta[k] * np.pi / (2 * N))) for k in range(m)])
-
-for k in range(m):
+for k in range(1, m+1):
     for i in range(1, N):
         for j in range(1, N):
             u[i, j] = u_old[i, j] + tau[k]*((u_old[i+1, j] - u_old[i, j]) / h2 - (u_old[i, j] - u_old[i-1, j]) / h2 + 
