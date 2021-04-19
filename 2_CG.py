@@ -54,13 +54,13 @@ F = np.zeros((N, N))
 for i in range(1, N):
     for j in range(1, N):
         F[i, j] = -f(x[i], y[j]) 
-        if i-1 < 1 and 1 <= j <= N_1:
+        if i-1 < 1:
             F[i, j] += mu(0.0, y[j]) / h2
-        if i+1 >= N and 1 <= j <= N_1:
+        if i+1 >= N:
             F[i, j] += mu(1.0, y[j]) / h2
-        if j-1 < 1 and 1 <= i <= N_1:
+        if j-1 < 1:
             F[i, j] += mu(x[i], 0.0) / h2
-        if j+1 >= N and 1 <= i <= N_1:
+        if j+1 >= N:
             F[i, j] += mu(x[i], 1.0) / h2
 
 #print(F)
