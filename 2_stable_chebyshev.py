@@ -14,7 +14,7 @@ def mu(x, y):
 def f(x, y):
     return -12 * x * y
 
-N = 32 
+N = 64 
 N1 = N+1
 L = 1.0 
 h = L/N
@@ -82,9 +82,9 @@ def pow_two(n):
 
 teta = get_teta(m+1)
 teta = np.array([0] + teta) 
-tau = np.zeros(m+1)
-for k in range(1, m+1):
-    tau[k] = 2 /  (delta2 + delta + (delta2-delta)*np.cos(teta[k] * np.pi / (2 * m))) 
+tau = np.zeros(len(teta))
+for k in range(1, len(teta)):
+    tau[k] = 2 /  (delta2 + delta + (delta2-delta)*np.cos(teta[k] * np.pi / (2 * len(teta)))) 
 
 for k in range(1, m+1):
     for i in range(1, N):
