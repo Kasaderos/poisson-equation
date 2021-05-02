@@ -19,7 +19,7 @@ def f(x, y):
 # def f(x, y):
 #     return -np.cos(x) - np.sin(y)
 
-N = 4 
+N = 32 
 N1 = N + 1 
 N_1 = N - 1
 L = 1.0 
@@ -69,8 +69,7 @@ r = f.copy()
 p = f
 
 eps = 1e-3
-z = np.zeros(N * N)
-print(f)
+z = np.zeros(N_1 * N_1)
 #  4 -1  0 -1  0  0  0  0  0 -0.75             
 # -1  4 -1  0 -1  0  0  0  0 -1.5
 #  0 -1  4  0  0 -1  0  0  0  2.
@@ -97,19 +96,23 @@ while norm_p2(r) > eps:
             k4 = (i-1) * N_1 + j-2 
 
             if i-1 < 1 and j-1 < 1:
-                z[k] = (-u[i+1, j]*p[k1] + 4*u[i, j]*p[k] - u[i, j+1]*p[k3])/h2 
+                z[k] = (-p[k1] + 4*p[k] - p[k3])/h2 
             elif i+1 >= N and j+1 >= N:
-                z[k] = (4*u[i, j]*p[k] - u[i-1, j]*p[k2] - u[i, j-1]*p[k4])/h2 
+                z[k] = (4*p[k] - p[k2] - p[k4])/h2 
+            elif i-1 < 1 and j+1 >= N:
+                z[k] = (-p[k1] + 4*p[k] - p[k4])/h2 
+            elif j-1 < 1 and i+1 >= N:
+                z[k] = (4*p[k] - p[k3] - p[k2])/h2 
             elif i-1 < 1:
-                z[k] = (-u[i+1, j]*p[k1] + 4*u[i, j]*p[k] - u[i, j+1]*p[k3] - u[i, j-1]*p[k4])/h2 
+                z[k] = (-p[k1] + 4*p[k] - p[k3] - p[k4])/h2 
             elif j-1 < 1:
-                z[k] = (-u[i+1, j]*p[k1] + 4*u[i, j]*p[k] - u[i, j+1]*p[k3] - u[i-1, j]*p[k2])/h2 
+                z[k] = (-p[k1] + 4*p[k] - p[k3] - p[k2])/h2 
             elif i+1 >= N:
-                z[k] = (4*u[i, j]*p[k] - u[i, j+1]*p[k3] - u[i-1, j]*p[k2] - u[i, j-1]*p[k4]) /h2 
+                z[k] = (4*p[k] - p[k3] - p[k2] - p[k4]) /h2 
             elif j+1 >= N: 
-                z[k] = (-u[i+1, j]*p[k1] + 4*u[i, j]*p[k] - u[i-1, j]*p[k2] - u[i, j-1]*p[k4])/h2 
+                z[k] = (-p[k1] + 4*p[k] - p[k2] - p[k4])/h2 
             else:
-                z[k] = (-u[i+1, j]*p[k1] + 4*u[i, j]*p[k] - u[i-1, j]*p[k2] - u[i, j-1]*p[k4] - u[i, j+1]*p[k3])/h2 
+                z[k] = (-p[k1] + 4*p[k] - p[k2] - p[k4] - p[k3])/h2 
 
     nu = np.dot(r_old.T, r_old) / np.dot(p.T, z)
     x = x + nu * p
@@ -123,6 +126,6 @@ while norm_p2(r) > eps:
     err = norm(u - ua[1:N,1:N])
     print('max|u-u*| =', err)
     print('||r_k||_2 =', norm_p2(r))
-    time.sleep(100)
+    time.sleep(0.1)
 
 
