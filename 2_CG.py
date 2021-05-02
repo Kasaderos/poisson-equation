@@ -37,12 +37,11 @@ for i in range(N1):
     for j in range(N1):
         ua[i, j] = mu(x[i], y[j])
 
-# a, b, c = 1/h2 * np.array([-1.0, 4.0, -1.0])
-a, b, c = np.array([-1.0, 4.0, -1.0])
-# e = -1/h2 
-e = -1.0
+a, b, c = 1/h2 * np.array([-1.0, 4.0, -1.0])
+e = -1/h2 
+#a, b, c = np.array([-1.0, 4.0, -1.0])
+#e = -1.0
 F = np.zeros((N, N))
-
 for i in range(1, N):
     for j in range(1, N):
         F[i, j] = -f(x[i], y[j]) 
@@ -54,7 +53,7 @@ for i in range(1, N):
             F[i, j] += mu(x[i], 0.0) / h2
         if j+1 >= N:
             F[i, j] += mu(x[i], 1.0) / h2
-
+# dim = (N-1)*(N-1)
 f = F[1:N, 1:N].ravel()
 
 # eigens = np.linalg.eigvals(A)
@@ -67,11 +66,10 @@ x = np.zeros(N_1 * N_1)
 
 r_old = f.copy()
 r = f.copy() 
-p = f.copy()
+p = f
 
 eps = 1e-3
-N_2 = N_1 - 1
-z = np.zeros(N_1 * N_1)
+z = np.zeros(N * N)
 print(f)
 #  4 -1  0 -1  0  0  0  0  0 -0.75             
 # -1  4 -1  0 -1  0  0  0  0 -1.5
@@ -84,35 +82,35 @@ print(f)
 #  0  0  0  0  0 -1  0 -1  4  30.75
 print(a, b, c, e)
 while norm_p2(r) > eps: 
-    # z1 = b*b1+c*b2+e*b4
-    # z2 = a*b1+b*b2+c*b3+e*b5
-    # z3 = a*b2+b*b3+c*b4+e*b6
-    # z4 = e*b1 + a*b3+b*b4+c*b5+e*b7
-    # ...
-    # zn_1 = e*b_n_4 + a*b_n_2 + b*b_n_1 + c*b_n
-    # zn = e*b_n_3 + a*b_n_1 + b*b_n 
-    z[0] = b*p[0] + c*p[1] + e*p[1+N_2]
-    j = 0
-    for i in range(1, N_2):
-        z[i] = a*p[j] + b*p[j+1] + c*p[j+2] + e*p[j+2+N_2]
-        j += 1
-    z[N_2] = a*p[j] + b*p[j+1] + e*p[j+1+N_1]
-    print(z)
-
-    j = 0
-    for i in range(N_1, 2*N_1):
-        z[i] = e*p[j] + a*p[j+N_1] + b*p[j+N_1+1] + c*p[j+N_1+2] + e*p[j+N_1+2+N_1]
-        j += 1
-    print(z)
-    
-    j = N_1
-    z[i] = e*p[j] + a*p[j+N_1] + b*p[j+N_1+1] + c*p[j+N_1+2]
-    for i in range(N_1*(N_1-1), (N_1*N_1-N_2+2)):
-        z[i] = e*p[j] + a*p[j+N_2] + b*p[j+N_2+1] + c*p[j+N_2+2]
-        j += 1
-    z[N_1*N_1-1] = e*p[N_1*N_1-N_1-1] + a*p[N_1*N_1-N_1+N_2] + b*p[N_1*N_1-1]
-    print(z)
     # z = np.dot(A, p)
+    for i in range(1, N):
+        for j in range(1, N):
+            # i, j
+            k = (i-1) * N_1 + j-1
+            # i+1, j
+            k1 = i * N_1 + j-1 
+            # i-1, j
+            k2 = (i-2) * N_1 + j-1 
+            # i, j+1
+            k3 = (i-1) * N_1 + j 
+            # i, j-1
+            k4 = (i-1) * N_1 + j-2 
+
+            if i-1 < 1 and j-1 < 1:
+                z[k] = (-u[i+1, j]*p[k1] + 4*u[i, j]*p[k] - u[i, j+1]*p[k3])/h2 
+            elif i+1 >= N and j+1 >= N:
+                z[k] = (4*u[i, j]*p[k] - u[i-1, j]*p[k2] - u[i, j-1]*p[k4])/h2 
+            elif i-1 < 1:
+                z[k] = (-u[i+1, j]*p[k1] + 4*u[i, j]*p[k] - u[i, j+1]*p[k3] - u[i, j-1]*p[k4])/h2 
+            elif j-1 < 1:
+                z[k] = (-u[i+1, j]*p[k1] + 4*u[i, j]*p[k] - u[i, j+1]*p[k3] - u[i-1, j]*p[k2])/h2 
+            elif i+1 >= N:
+                z[k] = (4*u[i, j]*p[k] - u[i, j+1]*p[k3] - u[i-1, j]*p[k2] - u[i, j-1]*p[k4]) /h2 
+            elif j+1 >= N: 
+                z[k] = (-u[i+1, j]*p[k1] + 4*u[i, j]*p[k] - u[i-1, j]*p[k2] - u[i, j-1]*p[k4])/h2 
+            else:
+                z[k] = (-u[i+1, j]*p[k1] + 4*u[i, j]*p[k] - u[i-1, j]*p[k2] - u[i, j-1]*p[k4] - u[i, j+1]*p[k3])/h2 
+
     nu = np.dot(r_old.T, r_old) / np.dot(p.T, z)
     x = x + nu * p
     r = r_old - nu * z
